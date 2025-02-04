@@ -68,11 +68,22 @@ def process_one_file(arguments):
     fn, args = arguments
     fn_stem = fn.stem
     output_path = pathlib.Path(args.output)
-    solid = load_step(fn)[0]  # Assume there's one solid per file
-    graph = build_graph(
-        solid, args.curv_u_samples, args.surf_u_samples, args.surf_v_samples
-    )
-    dgl.data.utils.save_graphs(str(output_path.joinpath(fn_stem + ".bin")), [graph])
+
+    try:
+        # Attempt to load the solid from the STEP file
+        solid = load_step(fn)[0]  # Assume there's one solid per file
+
+        # Attempt to build the graph from the solid
+        graph = build_graph(
+            solid, args.curv_u_samples, args.surf_u_samples, args.surf_v_samples
+        )
+
+        # Save the graph to a file
+        dgl.data.utils.save_graphs(str(output_path.joinpath(fn_stem + ".bin")), [graph])
+
+    except Exception as e:
+        # Log the error and the file that caused it
+        print(f"Error processing file {fn}: {e}")
 
 
 def initializer():
@@ -86,15 +97,15 @@ def process(args):
     if not output_path.exists():
         output_path.mkdir(parents=True, exist_ok=True)
     step_files = list(input_path.glob("*.st*p"))
-    # for fn in tqdm(step_files):
-    #     process_one_file(fn, args)
-    pool = Pool(processes=args.num_processes, initializer=initializer)
-    try:
-        results = list(tqdm(pool.imap(process_one_file, zip(step_files, repeat(args))), total=len(step_files)))
-    except KeyboardInterrupt:
-        pool.terminate()
-        pool.join()
-    print(f"Processed {len(results)} files.")
+    for fn in tqdm(step_files):
+        process_one_file((fn, args))
+    # pool = Pool(processes=args.num_processes, initializer=initializer)
+    # try:
+    #     results = list(tqdm(pool.imap(process_one_file, zip(step_files, repeat(args))), total=len(step_files)))
+    # except KeyboardInterrupt:
+    #     pool.terminate()
+    #     pool.join()
+    # print(f"Processed {len(results)} files.")
 
 
 def main():

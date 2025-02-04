@@ -81,7 +81,6 @@ class _MLP(nn.Module):
         self.linear_or_not = True  # default is linear model
         self.num_layers = num_layers
         self.output_dim = output_dim
-
         if num_layers < 1:
             raise ValueError("Number of layers should be positive!")
         elif num_layers == 1:
@@ -224,7 +223,7 @@ class _EdgeConv(nn.Module):
             hidden_mlp_dim (int, optional): Hidden feature dimension in the MLP. Defaults to 64.
         """
         super(_EdgeConv, self).__init__()
-        self.proj = _MLP(1, node_feats, hidden_mlp_dim, edge_feats)
+        self.proj = _MLP(1, out_feats, hidden_mlp_dim, edge_feats)
         self.mlp = _MLP(num_mlp_layers, edge_feats, hidden_mlp_dim, out_feats)
         self.batchnorm = nn.BatchNorm1d(out_feats)
         self.eps = torch.nn.Parameter(torch.FloatTensor([0.0]))
@@ -267,7 +266,7 @@ class _NodeConv(nn.Module):
             bias=False,
         )
         self.batchnorm = nn.BatchNorm1d(out_feats)
-        self.mlp = _MLP(num_mlp_layers, node_feats, hidden_mlp_dim, out_feats)
+        self.mlp = _MLP(num_mlp_layers, out_feats, hidden_mlp_dim, out_feats)
         self.eps = torch.nn.Parameter(torch.FloatTensor([0.0]))
 
     def forward(self, graph, nfeat, efeat):
@@ -331,7 +330,6 @@ class UVNetGraphEncoder(nn.Module):
                     hidden_mlp_dim=hidden_dim,
                 )
             )
-
         # Linear function for graph poolings of output of each layer
         # which maps the output of different layers into a prediction score
         self.linears_prediction = torch.nn.ModuleList()
@@ -341,7 +339,6 @@ class UVNetGraphEncoder(nn.Module):
                 self.linears_prediction.append(nn.Linear(input_dim, output_dim))
             else:
                 self.linears_prediction.append(nn.Linear(hidden_dim, output_dim))
-
         self.drop1 = nn.Dropout(0.3)
         self.drop = nn.Dropout(0.5)
         self.pool = MaxPooling()
@@ -349,7 +346,6 @@ class UVNetGraphEncoder(nn.Module):
     def forward(self, g, h, efeat):
         hidden_rep = [h]
         he = efeat
-
         for i in range(self.num_layers - 1):
             # Update node features
             h = self.node_conv_layers[i](g, h, he)

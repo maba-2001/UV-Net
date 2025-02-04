@@ -29,12 +29,12 @@ def draw_face_uvgrids(solid, graph, viewer):
 
     # Draw the points
     viewer.display_points(
-        points, color=(51.0 / 255.0, 0, 1), marker="point", scale=2*max_length
+        points, color=(51.0 / 255.0, 0, 1), marker="point", scale=0.25*max_length
     )
 
-    # Draw the normals
-    for pt, nor in zip(points, normals):
-        viewer.display(Edge.make_line_from_points(pt, pt + nor * 0.05 * max_length), color=(51.0 / 255.0, 0, 1))
+    # # Draw the normals
+    # for pt, nor in zip(points, normals):
+    #     viewer.display(Edge.make_line_from_points(pt, pt + nor * 0.1 * max_length), color=(51.0 / 255.0, 0, 1))
 
 
 def draw_edge_uvgrids(solid, graph, viewer):
@@ -51,13 +51,14 @@ def draw_edge_uvgrids(solid, graph, viewer):
     bbox = solid.box()
     max_length = max(bbox.x_length(), bbox.y_length(), bbox.z_length())
 
-    # Draw the points
-    viewer.display_points(points, color=(1, 0, 1), marker="point", scale=2*max_length)
+    # Draw the points with smaller dots
+    viewer.display_points(points, color=(1, 0, 1), marker="point", scale=0.25 * max_length)
 
     # Draw the tangents
-    for pt, tgt in zip(points, tangents):
-        viewer.display(Edge.make_line_from_points(pt, pt + tgt * 0.1 * max_length), color=(1, 0, 1))
-
+    # for pt, tgt in zip(points, tangents):
+    #     viewer.display(
+    #         Edge.make_line_from_points(pt, pt + tgt * 0.1 * max_length), color=(1, 0, 1)
+    #     )
 
 def draw_graph_edges(solid, graph, viewer):
     src, dst = graph.edges()
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     # Draw the edge UV-grids
     draw_edge_uvgrids(solid, graph, viewer=v)
     # Draw face-adj graph edges
-    draw_graph_edges(solid, graph, viewer=v)
+    # draw_graph_edges(solid, graph, viewer=v)
 
     v.fit()
     v.show()
