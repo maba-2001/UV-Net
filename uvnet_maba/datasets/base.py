@@ -2,7 +2,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch import FloatTensor
 import dgl
 from dgl.data.utils import load_graphs
-from datasets import util
+from . import util
 from tqdm import tqdm
 from abc import abstractmethod
 

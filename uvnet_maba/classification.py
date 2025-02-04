@@ -7,8 +7,8 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.utilities.seed import seed_everything
 
-from datasets.solidletters import SolidLetters
-from uvnet.models import Classification
+from datasets import Dataset
+from .models import Classification
 
 parser = argparse.ArgumentParser("UV-Net solid model classification")
 parser.add_argument(
@@ -63,11 +63,6 @@ trainer = Trainer.from_argparse_args(
         str(results_path), name=month_day, version=hour_min_second,
     ),
 )
-
-if args.dataset == "solidletters":
-    Dataset = SolidLetters
-else:
-    raise ValueError("Unsupported dataset")
 
 if args.traintest == "train":
     # Train/val
